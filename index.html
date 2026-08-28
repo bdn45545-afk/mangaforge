@@ -1,93 +1,153 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MangaForge - AI Manga Generator</title>
+    <title>MangaForge - Advanced AI Manga Studio</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; text-align: center; padding: 20px; }
-        .container { max-width: 600px; margin: 40px auto; background: #161b22; padding: 30px; border-radius: 12px; border: 1px solid #30363d; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        h1 { color: #58a6ff; margin-bottom: 10px; font-size: 2.2rem; }
-        p { color: #8b949e; margin-bottom: 25px; }
-        textarea { width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #fff; font-size: 1rem; resize: none; margin-bottom: 15px; }
-        textarea:focus { outline: 1px solid #58a6ff; }
-        button { width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #2ea043; }
-        .download-btn { display: none; margin-top: 15px; background: #1f6feb; }
-        .download-btn:hover { background: #388bfd; }
-        .result-box { margin-top: 25px; min-height: 250px; display: flex; align-items: center; justify-content: center; border: 2px dashed #30363d; border-radius: 8px; overflow: hidden; background: #0d1117; flex-direction: column; padding: 10px; }
-        img { max-width: 100%; height: auto; display: none; border-radius: 6px; }
-        .loading { display: none; color: #58a6ff; font-weight: bold; }
-        .error { display: none; color: #f85149; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042); color: #ffffff; text-align: center; padding: 20px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 20px auto; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        h1 { color: #38bdf8; margin-bottom: 8px; font-size: 2.5rem; text-shadow: 0 2px 12px rgba(56, 189, 248, 0.4); }
+        p { color: #94a3b8; margin-bottom: 25px; font-size: 1rem; }
+        
+        textarea { width: 100%; height: 100px; padding: 14px; border-radius: 12px; border: 2px solid #334155; background: #090d16; color: #fff; font-size: 1rem; resize: none; margin-bottom: 20px; transition: 0.3s; }
+        textarea:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.3); }
+        
+        /* Options Grid */
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; text-align: left; }
+        .option-group label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
+        select, input[type="number"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 0.95rem; outline: none; }
+        select:focus, input:focus { border-color: #38bdf8; }
+
+        button { width: 100%; padding: 15px; background: linear-gradient(135deg, #0284c7, #2563eb); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4); }
+        button:hover { background: linear-gradient(135deg, #0369a1, #1d4ed8); transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        /* Result Gallery Grid */
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { background: #090d16; padding: 12px; border-radius: 12px; border: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .card img { width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .page-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; color: #38bdf8; border: 1px solid #38bdf8; }
+        
+        .download-btn { margin-top: 10px; padding: 10px; font-size: 0.9rem; background: linear-gradient(135deg, #ec4899, #d946ef); border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
+        .download-btn:hover { background: linear-gradient(135deg, #db2777, #c084fc); }
+
+        .status-msg { margin-top: 20px; font-weight: bold; color: #38bdf8; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🎨 MangaForge AI</h1>
-        <p>আপনার মনমতো মঙ্গা ও এনিমে আর্ট জেনারেট করুন!</p>
+        <h1>🎨 MangaForge AI Studio</h1>
+        <p>Customize styles, colors, and generate up to 30 Manga pages instantly!</p>
         
-        <textarea id="prompt" placeholder="উদাহরণ: A cool anime boy with silver hair, action pose, black hoodie, manga style..."></textarea>
-        <button id="genBtn" onclick="generateImage()">Manga Image জেনারেট করুন</button>
+        <textarea id="prompt" placeholder="Example: Epic samurai battle on top of a snowy mountain, high detail, dramatic lighting..."></textarea>
+        
+        <div class="options-grid">
+            <div class="option-group">
+                <label for="mangaStyle">Manga Theme/Style</label>
+                <select id="mangaStyle">
+                    <option value="classic">Classic Shonen Manga</option>
+                    <option value="dark">Dark Fantasy / Seinen</option>
+                    <option value="anime">Modern Anime Artwork</option>
+                    <option value="cyberpunk">Cyberpunk / Sci-Fi Manga</option>
+                </select>
+            </div>
 
-        <div class="result-box">
-            <span id="placeholder">আপনার জেনারেট করা ছবি এখানে দেখাবে</span>
-            <span id="loading" class="loading">ছবি তৈরি হচ্ছে, একটু অপেক্ষা করুন...</span>
-            <span id="errorMsg" class="error">ছবি লোড হতে সমস্যা হয়েছে, আবার চেষ্টা করুন!</span>
-            <img id="mangaImage" alt="Generated Manga Art">
+            <div class="option-group">
+                <label for="colorMode">Color Mode</label>
+                <select id="colorMode">
+                    <option value="bw">Black & White (Classic Ink)</option>
+                    <option value="color">Full Color (Vibrant)</option>
+                </select>
+            </div>
+
+            <div class="option-group">
+                <label for="pageCount">Pages to Generate (Max 30)</label>
+                <input type="number" id="pageCount" min="1" max="30" value="1">
+            </div>
         </div>
 
-        <a id="downloadLink" href="#" target="_blank" download="manga_art.png" style="text-decoration: none;">
-            <button id="downloadBtn" class="download-btn">ছবি ডাউনলোড করুন</button>
-        </a>
+        <button id="genBtn" onclick="generateManga()">Generate Manga Pages</button>
+
+        <div id="statusMsg" class="status-msg"></div>
+        <div id="gallery" class="gallery"></div>
     </div>
 
     <script>
-        function generateImage() {
-            const promptInput = document.getElementById('prompt');
-            const promptText = promptInput.value.trim();
-            const imgElement = document.getElementById('mangaImage');
-            const loadingText = document.getElementById('loading');
-            const placeholderText = document.getElementById('placeholder');
-            const errorMsg = document.getElementById('errorMsg');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const downloadLink = document.getElementById('downloadLink');
+        function generateManga() {
+            const promptText = document.getElementById('prompt').value.trim();
+            const mangaStyle = document.getElementById('mangaStyle').value;
+            const colorMode = document.getElementById('colorMode').value;
+            let pageCount = parseInt(document.getElementById('pageCount').value) || 1;
+            
+            const gallery = document.getElementById('gallery');
+            const statusMsg = document.getElementById('statusMsg');
             const genBtn = document.getElementById('genBtn');
 
             if (!promptText) {
-                alert("দয়া করে একটি প্রম্পট লিখুন!");
+                alert("Please enter a prompt!");
                 return;
             }
 
-            imgElement.style.display = 'none';
-            placeholderText.style.display = 'none';
-            errorMsg.style.display = 'none';
-            downloadBtn.style.display = 'none';
-            loadingText.style.display = 'block';
+            // Limit pages between 1 and 30
+            if (pageCount < 1) pageCount = 1;
+            if (pageCount > 30) pageCount = 30;
+            document.getElementById('pageCount').value = pageCount;
+
+            // Clear previous gallery
+            gallery.innerHTML = '';
+            statusMsg.innerText = `Generating ${pageCount} Manga Page(s)... Please wait!`;
             genBtn.disabled = true;
-            genBtn.innerText = "জেনারেট হচ্ছে...";
 
-            const fullPrompt = encodeURIComponent(promptText + ", high quality manga art style, anime aesthetic, detailed, highly dynamic");
-            const randomSeed = Math.floor(Math.random() * 100000);
-            const imageUrl = `https://image.pollinations.ai/prompt/${fullPrompt}?width=512&height=512&nologo=true&seed=${randomSeed}`;
+            // Style modifier mapping
+            let stylePrompt = ", high quality, detailed line art, official manga artwork, sharp focus";
+            if (mangaStyle === 'classic') stylePrompt += ", classic shonen manga panel, action composition";
+            if (mangaStyle === 'dark') stylePrompt += ", dark fantasy, seinen manga style, heavy shadows, intense contrast";
+            if (mangaStyle === 'anime') stylePrompt += ", vibrant anime key visual, studio quality visual";
+            if (mangaStyle === 'cyberpunk') stylePrompt += ", cyberpunk manga aesthetics, futuristic sci-fi details, neon glow";
 
-            imgElement.src = imageUrl;
+            if (colorMode === 'bw') {
+                stylePrompt += ", monochrome, black and white ink drawing, traditional screentone shading, no color";
+            } else {
+                stylePrompt += ", full color illustration, vibrant coloring, masterwork color palette";
+            }
 
-            imgElement.onload = () => {
-                loadingText.style.display = 'none';
-                imgElement.style.display = 'block';
-                downloadBtn.style.display = 'block';
-                downloadLink.href = imageUrl;
-                genBtn.disabled = false;
-                genBtn.innerText = "Manga Image জেনারেট করুন";
+            let loadedCount = 0;
+
+            for (let i = 1; i <= pageCount; i++) {
+                const randomSeed = Math.floor(Math.random() * 999999);
+                const fullPrompt = encodeURIComponent(`${promptText}${stylePrompt}, page ${i}`);
+                const imageUrl = `https://image.pollinations.ai/prompt/${fullPrompt}?width=512&height=768&nologo=true&seed=${randomSeed}`;
+
+                // Create Card element
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <span class="page-badge">Page ${i}</span>
+                    <img src="${imageUrl}" alt="Manga Page ${i}" onload="onPageLoad()" onerror="onPageError(this)">
+                    <a href="${imageUrl}" target="_blank" download="manga_page_${i}.png" class="download-btn">📥 Download Page ${i}</a>
+                `;
+
+                gallery.appendChild(card);
+            }
+
+            window.onPageLoad = function() {
+                loadedCount++;
+                if (loadedCount >= pageCount) {
+                    statusMsg.innerText = `Successfully generated ${pageCount} Page(s)!`;
+                    genBtn.disabled = false;
+                }
             };
 
-            imgElement.onerror = () => {
-                loadingText.style.display = 'none';
-                errorMsg.style.display = 'block';
-                genBtn.disabled = false;
-                genBtn.innerText = "Manga Image জেনারেট করুন";
+            window.onPageError = function(img) {
+                loadedCount++;
+                img.alt = "Failed to load image";
+                if (loadedCount >= pageCount) {
+                    statusMsg.innerText = "Generation completed (some images may have failed to load).";
+                    genBtn.disabled = false;
+                }
             };
         }
     </script>
